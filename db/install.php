@@ -35,11 +35,14 @@ function xmldb_block_educheckout_install() {
 
     $DB->set_field('block_instances', 'blockname', 'educheckout', ['blockname' => 'moodec']);
 
-    if ($DB->record_exists('block', ['name' => 'moodec'])) {
-        if ($DB->record_exists('block', ['name' => 'educheckout'])) {
-            $DB->delete_records('block', ['name' => 'moodec']);
+    if ($old = $DB->get_record('block', ['name' => 'moodec'])) {
+        if ($new = $DB->get_record('block', ['name' => 'educheckout'])) {
+            $new->visible  = $old->visible;
+            $new->lastcron = $old->lastcron;
+            $DB->update_record('block', $new);
+            $DB->delete_records('block', ['id' => $old->id]);
         } else {
-            $DB->set_field('block', 'name', 'educheckout', ['name' => 'moodec']);
+            $DB->set_field('block', 'name', 'educheckout', ['id' => $old->id]);
         }
     }
 
